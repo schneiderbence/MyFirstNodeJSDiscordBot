@@ -12,6 +12,7 @@ var lobbyName = [];
 var lobbyId = [];
 const MAX_PLAYER = 12;
 var MANAGE_ROLE;
+const lobbyList = new Discord.MessageEmbed();
 
 //role who can use =add, =remove, ... and manage the lobby and the Bot
 client.on('message', (message) => {
@@ -24,7 +25,6 @@ client.on('message', (message) => {
                 author: { name: 'This command should look like this: "=manage SERVER_ROLE SERVER_ROLE"'},
                 timestamp: new Date(),
             }});
-            //message.channel.send('This command should look like this: "=manage SERVER_ROLE SERVER_ROLE"');
         }
     }
 });
@@ -35,11 +35,7 @@ client.on('message', (message) => {
         if (!lobbyName.includes(message.author.username) && !lobbyId.includes(message.author.id) && lobbyName.length !== MAX_PLAYER) {
             lobbyName.push(message.author.username);
             lobbyId.push(message.author.id);
-            message.channel.send({embed: {
-                color: 0x0099ff,
-                author: { name: message.author.username + ' have joined the lobby! ' + ' Lobby (' + lobbyName.length + ' / 12) | ' + lobbyName.join('/')},
-                timestamp: new Date(),
-            }});
+            message.channel.send(message.author.username + ' have joined the lobby! ' + ' Lobby (' + lobbyName.length + ' / 12) | ' + lobbyName.join('/'));
         } else {
             message.channel.send({embed: {
                 color: 0x0099ff,
@@ -56,11 +52,7 @@ client.on('message', (message) => {
         if (lobbyName.includes(message.author.username) && lobbyId.includes(message.author.id)) {
             lobbyName.pop(message.author.username);
             lobbyId.pop(message.author.id);
-            message.channel.send({embed: {
-                color: 0x0099ff,
-                author: { name: message.author.username + ' left the lobby! ' + ' Lobby (' + lobbyName.length + ' / 12) | ' + lobbyName.join('/')},
-                timestamp: new Date(),
-            }});
+            message.channel.send(message.author.username + ' left the lobby! ' + ' Lobby (' + lobbyName.length + ' / 12) | ' + lobbyName.join('/'));
         } else {
             message.channel.send({embed: {
                 color: 0x0099ff,
@@ -74,11 +66,7 @@ client.on('message', (message) => {
 //who is in the lobby
 client.on('message', (message) => {
     if (message.content === '=who') {
-        message.channel.send({embed: {
-            color: 0x0099ff,
-            author: { name: 'Lobby (' + lobbyName.length + ' / 12) | ' + lobbyName.join('/')},
-            timestamp: new Date(),
-        }});
+        message.channel.send('Lobby (' + lobbyName.length + ' / 12) | ' + lobbyName.join('/'));
     }
 });
 
@@ -102,11 +90,7 @@ client.on('message', (message) => {
             if (lobbyName.includes(taggedUser.username) && lobbyId.includes(taggedUser.id)) {
                 lobbyName.pop(taggedUser.username);
                 lobbyId.pop(taggedUser.id);
-                message.channel.send({embed: {
-                    color: 0x0099ff,
-                    author: { name: taggedUser.username + ' removed from the lobby! ' + ' Lobby (' + lobbyName.length + ' / 12) | ' + lobbyName.join('/')},
-                    timestamp: new Date(),
-                }});
+                message.channel.send(taggedUser.username + ' removed from the lobby! ' + ' Lobby (' + lobbyName.length + ' / 12) | ' + lobbyName.join('/'));
             } else {
                 message.channel.send({embed: {
                     color: 0x0099ff,
@@ -133,11 +117,7 @@ client.on('message', (message) => {
             if (!lobbyName.includes(taggedUser.username) && !lobbyId.includes(taggedUser.id) && lobbyName.length !== MAX_PLAYER) {
                 lobbyName.push(taggedUser.username);
                 lobbyId.push(taggedUser.id);
-                message.channel.send({embed: {
-                    color: 0x0099ff,
-                    author: { name: taggedUser.username + ' added from the lobby! ' + ' Lobby (' + lobbyName.length + ' / 12) | ' + lobbyName.join('/')},
-                    timestamp: new Date(),
-                }});
+                message.channel.send(taggedUser.username + ' added from the lobby! ' + ' Lobby (' + lobbyName.length + ' / 12) | ' + lobbyName.join('/'));
             } else {
                 message.channel.send({embed: {
                     color: 0x0099ff,
