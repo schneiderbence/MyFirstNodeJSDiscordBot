@@ -6,7 +6,7 @@ client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
 });
 
-client.login(process.env.TOKEN);
+client.login('ODI4NzA1NDAyMTc0MzA4NDM1.YGteDA.b_V_ZNmnJdhLIAK1sPrdWiRW6_E');
 
 var lobbyName = [];
 var lobbyId = [];
