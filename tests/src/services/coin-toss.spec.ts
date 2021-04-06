@@ -7,7 +7,11 @@ describe('CoinToss', () => {
         service = new CoinToss();
     })
 
-    it('should find "=ct" in the string', () => {
+    it('should only return true for =ct and nothing else', () => {
+        expect(service.isCoinToss('TEST =ct TEST')).to.be.false;
+        expect(service.isCoinToss('   ')).to.be.false;
+        expect(service.isCoinToss('')).to.be.false;
+        expect(service.isCoinToss('TEST =ct')).to.be.false;
         expect(service.isCoinToss('=ct')).to.be.true;
     })
 });

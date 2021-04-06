@@ -6,4 +6,5 @@ export const TYPES = {
     MessageResponder: Symbol("MessageResponder"),
     PingFinder: Symbol("PingFinder"),
     CoinToss: Symbol("CoinToss"),
+    JoinService: Symbol("JoinService"),
 };
