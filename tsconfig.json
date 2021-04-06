@@ -9,7 +9,8 @@
     "types": [
       // add node as an option
       "node",
-      "reflect-metadata"
+      "reflect-metadata",
+      "mocha"
     ],
     "typeRoots": [
       "node_modules/@types"

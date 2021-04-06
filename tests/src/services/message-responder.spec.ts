@@ -3,29 +3,36 @@ import 'mocha';
 import {expect} from 'chai';
 import {PingFinder} from "../../../src/services/ping-finder";
 import {MessageResponder} from "../../../src/services/message-responder";
-import {instance, mock, verify, when} from "ts-mockito";
-import {Message} from "discord.js";
+import {anyString, instance, mock, verify, when} from "ts-mockito";
+import {Message, TextChannel, User} from "discord.js";
+import {CoinToss} from "../../../src/services/coin-toss";
 
 describe('MessageResponder', () => {
     let mockedPingFinderClass: PingFinder;
     let mockedPingFinderInstance: PingFinder;
+    let mockedCoinTossClass: CoinToss;
+    let mockedCoinTossInstance: CoinToss;
     let mockedMessageClass: Message;
     let mockedMessageInstance: Message;
 
     let service: MessageResponder;
 
+    const channelId = "TEST_CHANNEL_ID"
+
     beforeEach(() => {
         mockedPingFinderClass = mock(PingFinder);
         mockedPingFinderInstance = instance(mockedPingFinderClass);
+        mockedCoinTossClass = mock(CoinToss);
+        mockedCoinTossInstance = instance(mockedCoinTossClass);
         mockedMessageClass = mock(Message);
         mockedMessageInstance = instance(mockedMessageClass);
-        setMessageContents();
+        setupMockMessage();
 
-        service = new MessageResponder(mockedPingFinderInstance);
+        service = new MessageResponder(mockedPingFinderInstance, mockedCoinTossInstance, channelId);
     })
 
     it('should reply', async () => {
-        whenIsPingThenReturn(true);
+        setupServiceMocks(true);
 
         await service.handle(mockedMessageInstance);
 
@@ -33,7 +40,7 @@ describe('MessageResponder', () => {
     })
 
     it('should not reply', async () => {
-        whenIsPingThenReturn(false);
+        setupServiceMocks(false);
 
         await service.handle(mockedMessageInstance).then(() => {
             // Successful promise is unexpected, so we fail the test
@@ -45,11 +52,35 @@ describe('MessageResponder', () => {
         verify(mockedMessageClass.reply('pong!')).never();
     })
 
-    function setMessageContents() {
+    it('should handle =ct', async () => {
+        setupServiceMocks(true)
+
+        await service.handle(mockedMessageInstance);
+
+        verify(mockedMessageClass.reply(anyString())).once();
+    })
+
+    it('should not handle =ct', async () => {
+        setupServiceMocks(false)
+
+        await service.handle(mockedMessageInstance).then(() => {
+            expect.fail('Unexpected promise');
+        }).catch(() => {
+            // Rejected promise is expected, so nothing happens here
+        });
+
+        verify(mockedMessageClass.reply(anyString())).never();
+    })
+
+    function setupMockMessage() {
         mockedMessageInstance.content = "Non-empty string";
+        mockedMessageInstance.channel = mock(TextChannel);
+        mockedMessageInstance.channel.id = channelId;
+        mockedMessageInstance.author = mock(User);
     }
 
-    function whenIsPingThenReturn(result: boolean) {
-        when(mockedPingFinderClass.isPing("Non-empty string")).thenReturn(result);
+    function setupServiceMocks(result: boolean) {
+        when(mockedPingFinderClass.isPing(anyString())).thenReturn(result);
+        when(mockedCoinTossClass.isCoinToss(anyString())).thenReturn(result);
     }
 });
