@@ -6,13 +6,26 @@ client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
 });
 
-client.login('ODI4NzA1NDAyMTc0MzA4NDM1.YGteDA.b_V_ZNmnJdhLIAK1sPrdWiRW6_E');
+client.login(process.env.TOKEN);
 
 var lobbyName = [];
 var lobbyId = [];
 const MAX_PLAYER = 12;
 var MANAGE_ROLE;
-const lobbyList = new Discord.MessageEmbed();
+var lobbyList = new Discord.MessageEmbed();
+
+function embedMaker () {
+    lobbyList.setTitle('Lobby (' + lobbyName.length + ' / 12) | ');
+    lobbyList.fields = [];
+    lobbyList.description = '';
+    for (let i = 0; i < lobbyName.length; i++) {
+        lobbyList.addFields({
+            name: '\u200B',
+            value: '**'+ lobbyName[i] + '**',
+            inline: true,
+        });
+    }
+}
 
 //role who can use =add, =remove, ... and manage the lobby and the Bot
 client.on('message', (message) => {
@@ -35,7 +48,9 @@ client.on('message', (message) => {
         if (!lobbyName.includes(message.author.username) && !lobbyId.includes(message.author.id) && lobbyName.length !== MAX_PLAYER) {
             lobbyName.push(message.author.username);
             lobbyId.push(message.author.id);
-            message.channel.send(message.author.username + ' have joined the lobby! ' + ' Lobby (' + lobbyName.length + ' / 12) | ' + lobbyName.join('/'));
+            embedMaker();
+            lobbyList.setDescription(message.author.username + ' joined the lobby!');
+            message.channel.send(lobbyList);
         } else {
             message.channel.send({embed: {
                 color: 0x0099ff,
@@ -50,9 +65,11 @@ client.on('message', (message) => {
 client.on('message', (message) => {
     if (message.content === '=l') {
         if (lobbyName.includes(message.author.username) && lobbyId.includes(message.author.id)) {
-            lobbyName.pop(message.author.username);
-            lobbyId.pop(message.author.id);
-            message.channel.send(message.author.username + ' left the lobby! ' + ' Lobby (' + lobbyName.length + ' / 12) | ' + lobbyName.join('/'));
+            lobbyName = lobbyName.filter(e => e != message.author.username);
+            lobbyId = lobbyId.filter(e => e != message.author.id);
+            embedMaker();
+            lobbyList.setDescription(message.author.username + ' left the lobby! ');
+            message.channel.send(lobbyList);
         } else {
             message.channel.send({embed: {
                 color: 0x0099ff,
@@ -66,7 +83,8 @@ client.on('message', (message) => {
 //who is in the lobby
 client.on('message', (message) => {
     if (message.content === '=who') {
-        message.channel.send('Lobby (' + lobbyName.length + ' / 12) | ' + lobbyName.join('/'));
+        embedMaker();
+        message.channel.send(lobbyList);
     }
 });
 
@@ -88,9 +106,11 @@ client.on('message', (message) => {
         if (message.mentions.users.size) {
             const taggedUser = message.mentions.users.first();
             if (lobbyName.includes(taggedUser.username) && lobbyId.includes(taggedUser.id)) {
-                lobbyName.pop(taggedUser.username);
-                lobbyId.pop(taggedUser.id);
-                message.channel.send(taggedUser.username + ' removed from the lobby! ' + ' Lobby (' + lobbyName.length + ' / 12) | ' + lobbyName.join('/'));
+                lobbyName = lobbyName.filter(e => e != taggedUser.username);
+                lobbyId = lobbyId.filter(e => e != taggedUser.id);
+                embedMaker();
+                lobbyList.setDescription(taggedUser.username + ' removed from the lobby!');
+                message.channel.send(lobbyList);
             } else {
                 message.channel.send({embed: {
                     color: 0x0099ff,
@@ -117,7 +137,9 @@ client.on('message', (message) => {
             if (!lobbyName.includes(taggedUser.username) && !lobbyId.includes(taggedUser.id) && lobbyName.length !== MAX_PLAYER) {
                 lobbyName.push(taggedUser.username);
                 lobbyId.push(taggedUser.id);
-                message.channel.send(taggedUser.username + ' added from the lobby! ' + ' Lobby (' + lobbyName.length + ' / 12) | ' + lobbyName.join('/'));
+                embedMaker();
+                lobbyList.setDescription(taggedUser.username + ' added from the lobby!');
+                message.channel.send(lobbyList);
             } else {
                 message.channel.send({embed: {
                     color: 0x0099ff,
@@ -141,11 +163,8 @@ client.on('message', (message) => {
     if (message.content.startsWith('=reset')) {
         lobbyName = [];
         lobbyId = [];
-        message.channel.send({embed: {
-            color: 0x0099ff,
-            author: { name: 'Lobby (' + lobbyName.length + ' / 12) | ' + lobbyName.join('/') + ' | The Lobby has been restored!'},
-            timestamp: new Date(),
-          }});
+        embedMaker();
+        message.channel.send(lobbyList);
     }
 });
 
