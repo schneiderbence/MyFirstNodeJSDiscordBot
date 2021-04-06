@@ -11,6 +11,7 @@ client.login(process.env.TOKEN);
 var lobbyName = [];
 var lobbyId = [];
 const MAX_PLAYER = 12;
+const CHANNEL_ID = '828935609149947944';
 var MANAGE_ROLE;
 var lobbyList = new Discord.MessageEmbed();
 
@@ -29,7 +30,7 @@ function embedMaker () {
 
 //role who can use =add, =remove, ... and manage the lobby and the Bot
 client.on('message', (message) => {
-    if (message.content === '=manage') {
+    if (message.content === '=manage' && message.channel.id === CHANNEL_ID) {
         if (message.mentions.roles.size) {
             MANAGE_ROLE = message.mentions.roles.forEach(e => {e.name});
         } else {
@@ -44,7 +45,7 @@ client.on('message', (message) => {
 
 //joining
 client.on('message', (message) => {
-    if (message.content === '=j') {
+    if (message.content === '=j' && message.channel.id === CHANNEL_ID) {
         if (!lobbyName.includes(message.author.username) && !lobbyId.includes(message.author.id) && lobbyName.length !== MAX_PLAYER) {
             lobbyName.push(message.author.username);
             lobbyId.push(message.author.id);
@@ -63,7 +64,7 @@ client.on('message', (message) => {
 
 //leaving
 client.on('message', (message) => {
-    if (message.content === '=l') {
+    if (message.content === '=l' && message.channel.id === CHANNEL_ID) {
         if (lobbyName.includes(message.author.username) && lobbyId.includes(message.author.id)) {
             lobbyName = lobbyName.filter(e => e != message.author.username);
             lobbyId = lobbyId.filter(e => e != message.author.id);
@@ -82,7 +83,7 @@ client.on('message', (message) => {
 
 //who is in the lobby
 client.on('message', (message) => {
-    if (message.content === '=who') {
+    if (message.content === '=who' && message.channel.id === CHANNEL_ID) {
         embedMaker();
         message.channel.send(lobbyList);
     }
@@ -90,7 +91,7 @@ client.on('message', (message) => {
 
 //cointoss
 client.on('message', (message) => {
-    if (message.content === '=ct') {
+    if (message.content === '=ct' && message.channel.id === CHANNEL_ID) {
         if (Math.random() >= 0.5 ) {
             message.channel.send(message.author.toString() + ' won, its heads!');
         } else {
@@ -102,7 +103,7 @@ client.on('message', (message) => {
 
 //remove player
 client.on('message', (message) => {
-    if (message.member.hasPermission('ADMINISTRATOR') && message.content.startsWith('=remove')) {
+    if (message.member.hasPermission('ADMINISTRATOR') && message.content.startsWith('=remove') && message.channel.id === CHANNEL_ID) {
         if (message.mentions.users.size) {
             const taggedUser = message.mentions.users.first();
             if (lobbyName.includes(taggedUser.username) && lobbyId.includes(taggedUser.id)) {
@@ -131,7 +132,7 @@ client.on('message', (message) => {
 
 //add player
 client.on('message', (message) => {
-    if (message.member.hasPermission('ADMINISTRATOR') && message.content.startsWith('=add')) {
+    if (message.member.hasPermission('ADMINISTRATOR') && message.content.startsWith('=add') && message.channel.id === CHANNEL_ID) {
         if (message.mentions.users.size) {
             const taggedUser = message.mentions.users.first();
             if (!lobbyName.includes(taggedUser.username) && !lobbyId.includes(taggedUser.id) && lobbyName.length !== MAX_PLAYER) {
@@ -160,7 +161,7 @@ client.on('message', (message) => {
 
 //reset lobby
 client.on('message', (message) => {
-    if (message.content.startsWith('=reset')) {
+    if (message.content.startsWith('=reset') && message.channel.id === CHANNEL_ID) {
         lobbyName = [];
         lobbyId = [];
         embedMaker();
