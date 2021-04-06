@@ -12,7 +12,7 @@ var lobbyName = [];
 var lobbyId = [];
 var tempLobby = [];
 const MAX_PLAYER = 12;
-const CHANNEL_ID = '828935609149947944';
+const CHANNEL_ID = '824737460230946888';
 var MANAGE_ROLE;
 
 function lobbyPrint () {
