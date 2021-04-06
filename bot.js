@@ -11,7 +11,7 @@ client.login(process.env.TOKEN);
 var lobbyName = [];
 var lobbyId = [];
 const MAX_PLAYER = 12;
-const CHANNEL_ID = '828935609149947944';
+const CHANNEL_ID = '824737460230946888';
 var MANAGE_ROLE;
 var lobbyList = new Discord.MessageEmbed();
 
