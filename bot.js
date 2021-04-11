@@ -47,7 +47,7 @@ client.on('message', (message) => {
         } else {
             message.channel.send({embed: {
                 color: 0x0099ff,
-                author: { name: 'You have already joind the lobby!'},
+                author: { name: 'You have already joined the lobby!'},
             }});
         }
     }
