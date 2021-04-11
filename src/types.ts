@@ -7,4 +7,9 @@ export const TYPES = {
     PingFinder: Symbol("PingFinder"),
     CoinToss: Symbol("CoinToss"),
     JoinService: Symbol("JoinService"),
+    LeaveService: Symbol("LeaveService"),
+    AddService: Symbol("AddService"),
+    RemoveService: Symbol("RemoveService"),
+    WhoService: Symbol("WhoService"),
+    ResetService: Symbol("ResetService"),
 };

@@ -2,23 +2,23 @@ import {injectable} from "inversify";
 import {Message, User} from "discord.js";
 
 @injectable()
-export class JoinService {
+export class LeaveService {
 
-    private regexp = '^=j';
+    private regexp = '^=l';
     private queue = [];
     private readonly queueLength = 12;
 
-    public isJoinMessage(stringToSearch: string): boolean {
+    public isLeaveMessage(stringToSearch: string): boolean {
         return stringToSearch.search(this.regexp) >= 0;
     }
 
     public handleMessage(message: Message): string {
-        if (!this.isJoined(message.author) && this.queueLength !== this.queue.length) {
-            this.queue.push(message.author);
+        if (this.isJoined(message.author)) {
+            this.queue = this.queue.filter(e => e != message.author);
             return '**Champions League (' + this.queue.length + '**' + ' **/** ' + '**' + this.queueLength + ')**' +
             ' **|** ' + this.generateUsernames();
         } else {
-            return 'You have already joined!';
+            return 'You havent joined yet!';
         }
         
     }
@@ -34,4 +34,7 @@ export class JoinService {
     public isJoined(username: User): boolean {
         return this.queue.includes(username);
     }
+
+
+
 }
