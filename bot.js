@@ -1,6 +1,7 @@
 require("dotenv").config();
 const Discord = require('discord.js');
 const client = new Discord.Client();
+const pickPhase = require('./picking');
 
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
@@ -11,9 +12,15 @@ client.login(process.env.TOKEN);
 var lobbyName = [];
 var lobbyId = [];
 var tempLobby = [];
+var red_team = [];
+var blue_team = [];
+var unpicked = [];
+var red_captain;
+var blue_captain;
 const MAX_PLAYER = 12;
 const CHANNEL_ID = '824737460230946888';
 var MANAGE_ROLE;
+
 
 function lobbyPrint () {
     tempLobby = [];
@@ -44,10 +51,15 @@ client.on('message', (message) => {
             lobbyId.push(message.author.id);
             lobbyPrint();
             message.channel.send('**Champions League (' + lobbyName.length + '**' + ' **/** ' + '**' + MAX_PLAYER + ')**' + ' **|** ' + tempLobby.join('/'));
-        } else {
+        } else if (lobbyName.includes(message.author.username) && lobbyId.includes(message.author.id)) {
             message.channel.send({embed: {
                 color: 0x0099ff,
                 author: { name: 'You have already joined the lobby!'},
+            }});
+        } else {
+            message.channel.send({embed: {
+                color: 0x0099ff,
+                author: { name: 'The lobby is full!'},
             }});
         }
     }
@@ -153,44 +165,55 @@ client.on('message', (message) => {
 });
 
 
-const exampleEmbed = {
-    color: 0x0099ff,
-    title: 'JK2 Champions League Picking',
-    fields: [
-        {
-            name: 'Red Captain',
-        },
-        {
-            name: 'Blue Captain',
-        },
-        {
-            name: '\u200B',
-            value:'\u200B',
-        },
-        {
-            name: 'Unpicked:',
-        },
-        {
-            name: 'Inline field title',
-            value: 'Some value here',
-            inline: true,
-        },
-        {
-            name: 'Inline field title',
-            value: 'Some value here',
-            inline: true,
-        },
-        {
-            name: 'Inline field title',
-            value: 'Some value here',
-            inline: true,
-        },
-    ],
-};
+//teams
 
-//table
 client.on('message', (message) => {
-    if (message.content === '=table') {
-        message.channel.send({ embed: exampleEmbed });
+    if (message.content === '=teams' && red_team.length !== 0 && blue_team.length !==0) {
+        unpicked = templobby.filter(e => e != tempLobby[blue_captain] && e!= tempLobby[red_captain]);
+        message.channel.send("__**JK2 Champions League Picking**__\n" + "**Red Captain:**\n" + red_captain + "\n\n" + 
+        "**Blue Captain:**\n" + blue_captain + "\n\n" + "**Unpicked:**\n" + unpicked.join(', '));
     }
 });
+
+
+if (lobbyName.length === MAX_PLAYER) {
+    unpicked = tempLobby;
+
+    message.channel.send("__**JK2 Champions League Picking**__\n" + "**Red Captain:**\n" + "\n\n" + 
+    "**Blue Captain:**\n" + "\n\n" + "**Unpicked:**\n" + unpicked.join(', '));
+
+    client.on('message', (message) => {
+        if (message.content === '=capfor red' && red_captain == '' && red_team.length == 0) {
+            red_captain = "`" + message.author.username + "`";
+            red_team.push(red_captain);
+            unpicked.filter(e => e != red_captain);
+            message.channel.send("__**JK2 Champions League Picking**__\n" + "**Red Captain:**\n" + red_team[0] + "\n\n" + 
+            "**Blue Captain:**\n" + blue_team[0] + "\n\n" + "**Unpicked:**\n" + unpicked.join(', '));
+
+        } else if (message.content === '=capfor red' && red_team.length == 1) {
+            red_captain = "`" + message.author.username + "`";
+            red_team.filter(e => e == "`" + message.author.username + "`");
+            unpicked.filter(e => e != red_captain);
+            message.channel.send("__**JK2 Champions League Picking**__\n" + "**Red Captain:**\n" + red_team[0] + "\n\n" + 
+            "**Blue Captain:**\n" + blue_team[0] + "\n\n" + "**Unpicked:**\n" + unpicked.join(', '));
+
+        } else if (message.content === '=capfor blue' && blue_team.length == 0) {
+            blue_captain = "`" + message.author.username + "`";
+            blue_team.push(blue_captain);
+            unpicked.filter(e => e != blue_captain);
+            message.channel.send("__**JK2 Champions League Picking**__\n" + "**Red Captain:**\n" + red_team[0] + "\n\n" + 
+            "**Blue Captain:**\n" + blue_team[0] + "\n\n" + "**Unpicked:**\n" + unpicked.join(', '));
+
+        } else if (message.content === '=capfor blue' && blue_team.length == 1) {
+            blue_captain = "`" + message.author.username + "`";
+            blue_team.filter(e => e == "`" + message.author.username + "`");
+            unpicked.filter(e => e != blue_captain);
+            message.channel.send("__**JK2 Champions League Picking**__\n" + "**Red Captain:**\n" + red_team[0] + "\n\n" + 
+            "**Blue Captain:**\n" + blue_team[0] + "\n\n" + "**Unpicked:**\n" + unpicked.join(', '));
+        }
+    });
+
+    pickPhase.pickingWithRules(tempLobby, red_team, red_captain, blue_team, blue_captain, unpicked, CHANNEL_ID);
+
+}
+
