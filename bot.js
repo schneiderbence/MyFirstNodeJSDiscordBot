@@ -16,6 +16,7 @@ var red_team = [];
 var blue_team = [];
 var unpicked = [];
 var red_captain;
+var red_name;
 var blue_captain;
 const MAX_PLAYER = 12;
 const CHANNEL_ID = '824737460230946888';
